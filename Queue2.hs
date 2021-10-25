@@ -34,4 +34,21 @@ instance Functor Queue where
 translation :: Num b => b -> Queue b -> Queue b
 translation x q = fmap (+x) q
 
-instance
+cuaLlista :: Queue a -> [a]
+cuaLlista (Queue lista1 lista2) = lista1 ++ reverse lista2
+
+instance Applicative Queue where
+  pure x = Queue [] [x]
+  f <*> q = Queue(cuaLlista f <*> cuaLlista q) []
+
+instance Monad Queue where
+  return x = Queue [] [x]
+  cua >>= f = Queue (concatMap (cuaLlista . f) (cuaLlista cua)) []
+
+kfilter :: (p -> Bool) -> Queue p -> Queue p
+kfilter func cua = do
+  x <- cua
+  if func x then
+    return x
+  else
+    create
