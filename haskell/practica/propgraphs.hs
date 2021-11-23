@@ -1,3 +1,4 @@
+main :: IO()
 main = do
   putStrLn $ "Benvinguts a la base de dades basades en grafs propis"
 
@@ -12,6 +13,7 @@ main = do
   fitxerTvalors <- getLine
 
   graf <- populate fitxerArestes fitxerLabels fitxerSigma fitxerTvalors
+  showGraph graf
 
   return()
 
@@ -86,7 +88,7 @@ instance Ord Etiqueta where
     |punt1 > punt2 = GT
 
 instance Show Etiqueta where
-  show (Etiqueta punt label) = "(" ++ show punt ++ "," ++ show label ++ ")"
+  show (Etiqueta punt label) = show label
 
 --Inicialitzem l'arbre binari de cerca amb punts i la seva etiqueta
 inicialitzaArbreArestesVertexsALabels :: [String] -> Abc Etiqueta -> Abc Etiqueta
@@ -110,7 +112,7 @@ instance Ord SigmaValue where
     |punt1 == punt2 && propietat1 == propietat2 = EQ
 
 instance Show SigmaValue where
-  show (SigmaValue punt propietat valor) = "(" ++ show punt ++ "," ++ show propietat ++ "," ++ show valor ++ ")"
+  show (SigmaValue punt propietat valor) = "(" ++ show propietat ++ "," ++ show valor ++ ")"
 
 --Inicialitzem l'abre binari de cerca per tal de relacionar un vertex/node amb una propietat i un valor
 inicialitzaArbrePuntPropietatAValor :: [String] -> Abc SigmaValue -> Abc SigmaValue
@@ -154,14 +156,17 @@ deleteDuplicate [] = []
 deleteDuplicate (x:xs) = x : deleteDuplicate (filter (/= x) xs)
 
 --Creem la estructura de dades graf
+---               Vertexs  Arestes  Labels   Props  Aresta->(v1,v2) lambda(va)->l sigma
 data Graf = Graf [String] [String] [String] [String] (Abc Aresta) (Abc Etiqueta) (Abc SigmaValue)
 
 --Creem la funcio populate
 populate :: String -> String -> String -> String -> IO Graf
 populate fitxerArestes fitxerLabels fitxerSigma fitxerTvalors = do
   llista <- llegirFitxerALlista fitxerArestes
-  let (arestes, vertexs) = separacioVertexsIArestes llista
-  let arbreRho = inicialitzaArbreArestaAVertexs arestes vertexs buit
+  let (arestesIntermig, vertexsIntermig) = separacioVertexsIArestes llista
+  let arestes = deleteDuplicate arestesIntermig
+  let vertexs = deleteDuplicate vertexsIntermig
+  let arbreRho = inicialitzaArbreArestaAVertexs arestesIntermig vertexsIntermig buit
 
   llista <- llegirFitxerALlista fitxerLabels
   let labelsIntermig = obtenirEtiquetes llista
@@ -176,3 +181,69 @@ populate fitxerArestes fitxerLabels fitxerSigma fitxerTvalors = do
   let arbreTipus = inicialitzaArbrePropietatATipus llista buit
 
   return (Graf vertexs arestes labels propietats arbreRho arbreLambda arbreSigma)
+
+--Primera part imprimir
+imprimirPropsPunto :: String -> [String] -> Abc SigmaValue -> IO()
+imprimirPropsPunto punto [] _ = do return ()
+imprimirPropsPunto punto (propiedadActual:props) sigmaTree = do
+  case (cerca (SigmaValue punto propiedadActual " ") sigmaTree) of
+    Just value -> putStr $ show value
+    Nothing -> putStr $ ""
+
+  imprimirPropsPunto punto props sigmaTree
+
+  putStr $ ""
+
+  return ()
+
+imprimir1 :: Graf -> IO()
+imprimir1 (Graf [] _ _ _ _ _ _) = do return ()
+imprimir1 (Graf (vertexActual:vertexs) arestes labels props rho lambda sigma) = do
+  putStr $ vertexActual ++ "["
+  case ((cerca (Etiqueta vertexActual " ") lambda)) of
+    Just value -> putStr $ show $ value
+    Nothing -> putStr $ ""
+  putStr $ "]{"
+
+  imprimirPropsPunto vertexActual props sigma
+
+  putStrLn $ "}"
+
+  imprimir1 (Graf vertexs arestes labels props rho lambda sigma)
+
+  return ()
+
+--Segona part imprimir
+imprimir2 :: Graf -> IO()
+imprimir2 (Graf _ [] _ _ _ _ _) = do return ()
+imprimir2 (Graf vertexs (arestaActual1:arestes) labels props rho lambda sigma) = do
+  case ((cerca (Aresta arestaActual1 " " " ") rho)) of
+    Just (Aresta a v1 v2) -> do
+      putStr $ "(" ++ v1 ++ ")" ++ "-"
+      putStr $ arestaActual1 ++ "["
+
+      case ((cerca (Etiqueta arestaActual1 " ") lambda)) of
+        Just value -> putStr $ show $ value
+        Nothing -> putStr $ ""
+
+      putStr $ "]->(" ++ v2 ++ "){"
+
+      imprimirPropsPunto arestaActual1 props sigma
+
+      putStrLn $ "}"
+
+      imprimir2 (Graf vertexs arestes labels props rho lambda sigma)
+
+    Nothing -> putStr $ ""
+
+  return ()
+
+--Funcio Total
+showGraph :: Graf -> IO()
+showGraph graf = do
+  imprimir1 graf
+
+  putStrLn $ ""
+
+  imprimir2 graf
+  return ()
