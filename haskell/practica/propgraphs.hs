@@ -4,20 +4,83 @@ main = do
 
   --Input de la primera part del problema, l'usuari introdueix els fitxers.
   putStrLn $ "Introdueix el fitxer on es contenen les arestes"
-  fitxerArestes <- getLine
+  --fitxerArestes <- getLine
+  let fitxerArestes = "rhoFile.pg"
   putStrLn $ "Introdueix el fitxer on es contenen els Labels dels nodes-arestes"
-  fitxerLabels <- getLine
+  --fitxerLabels <- getLine
+  let fitxerLabels = "lambdaFile.pg"
   putStrLn $ "Introdueix el fitxer on es troben els valors de cada nodes-arestes X propietat"
-  fitxerSigma <- getLine
+  --fitxerSigma <- getLine
+  let fitxerSigma = "sigmaFile.pg"
   putStrLn $ "Introdueix el fitxer on es troben el tipus dels valors de les propietats"
-  fitxerTvalors <- getLine
+  --fitxerTvalors <- getLine
+  let fitxerTvalors = "propFile.pg"
 
   graf <- populate fitxerArestes fitxerLabels fitxerSigma fitxerTvalors
   showGraph graf
 
+  bucle graf
+
   return()
 
+bucle :: Graf -> IO()
+bucle graf = do
+  putStrLn $ "Escull entre les seguents opcions:"
+  putStrLn $ "0. Sortir"
+  putStrLn $ "1. Afegir una aresta"
+  putStrLn $ "2. Afegir una propietat a un vertex o aresta"
+  putStrLn $ "3. Afegir un label a un vertex o aresta"
+
+  linia <- getLine
+  if linia == "0" then do
+    return ()
+
+  else if linia == "1" then do
+    putStrLn $ "Introdueix el nom de la aresta i els dels vertexs (un per linia)"
+    aresta <- getLine
+    v1 <- getLine
+    v2 <- getLine
+
+    let temp = graf
+    graf <- afegirAresta temp aresta v1 v2
+    showGraph graf
+
+    bucle graf
+    return()
+
+  else if linia == "2" then do
+    putStrLn $ "Introdueix el nom del vertex/aresta, propietat i valor (un per linia)"
+    vertex <- getLine
+    propietat <- getLine
+    valor <- getLine
+
+    let temp = graf
+    graf <- afegirPropietatVertexAresta temp vertex propietat valor
+    showGraph graf
+
+    bucle graf
+    return()
+
+  else if linia == "3" then do
+    putStrLn $ "Introdueix el nom del vertex/aresta i label (un per linia)"
+    vertex <- getLine
+    label <- getLine
+
+    let temp = graf
+    graf <- afegirLabels temp vertex label
+    showGraph graf
+
+    bucle graf
+    return()
+  else
+    bucle graf
+
+
 --Creem un ABC
+exact :: Aresta -> Aresta -> Bool
+exact (Aresta aresta1 v11 v12) (Aresta aresta2 v21 v22) =
+  aresta1 == aresta2 && v11 == v21 && v12 == v22
+
 data Abc a = Buit | Node a (Abc a) (Abc a)
 
 buit :: Abc a
@@ -29,6 +92,13 @@ cerca x (Node k fe fd)
     | x <  k        = cerca x fe
     | x >  k        = cerca x fd
     | x == k        = Just k
+
+existeix :: Aresta -> Abc Aresta -> Bool
+existeix _ Buit = False
+existeix x (Node k fe fd)
+    | x <  k        = existeix x fe
+    | x >  k        = existeix x fd
+    | exact x k     = True
 
 insereix :: Ord a => a -> Abc a -> Abc a
 insereix x Buit = Node x Buit Buit
@@ -242,8 +312,41 @@ imprimir2 (Graf vertexs (arestaActual1:arestes) labels props rho lambda sigma) =
 showGraph :: Graf -> IO()
 showGraph graf = do
   imprimir1 graf
-
   putStrLn $ ""
-
   imprimir2 graf
   return ()
+
+--Afegim una Aresta
+afegirAresta :: Graf -> String -> String -> String -> IO Graf
+afegirAresta (Graf vertexs arestes labels props rho lambda sigma) aresta v1 v2 = do
+
+  let tempVert = vertexs ++ [v1, v2]
+  let tempArest = arestes ++ [aresta]
+
+  let newVertexs = deleteDuplicate tempVert
+  let newArestes = deleteDuplicate tempArest
+
+  let temp = rho
+  let rho = insereix (Aresta aresta v1 v2) temp
+
+  return (Graf newVertexs newArestes labels props rho lambda sigma)
+
+--Afegim una propietat al vertex
+afegirPropietatVertexAresta :: Graf -> String -> String -> String -> IO Graf
+afegirPropietatVertexAresta (Graf vertexs arestes labels props rho lambda sigma) vertex propietat valor = do
+
+  let tempPropietats = props ++ [propietat]
+  let propietats = deleteDuplicate tempPropietats
+
+  let temp = sigma
+  let sigma = insereix (SigmaValue vertex propietat valor) temp
+
+  return (Graf vertexs arestes labels propietats rho lambda sigma)
+
+--Afegim label a aresta i vertex
+afegirLabels :: Graf -> String -> String -> IO Graf
+afegirLabels (Graf vertexs arestes labels props rho lambda sigma) punto label = do
+  let temp = lambda
+  let lambda = insereix (Etiqueta punto label) temp
+
+  return (Graf vertexs arestes labels props rho lambda sigma)
