@@ -30,6 +30,9 @@ bucle graf = do
   putStrLn $ "1. Afegir una aresta"
   putStrLn $ "2. Afegir una propietat a un vertex o aresta"
   putStrLn $ "3. Afegir un label a un vertex o aresta"
+  putStrLn $ "4. Consultar les propietats d'un vertex o una aresta"
+  putStrLn $ "5. Consulta els k primers valors d'una propietat de les arestes"
+  putStrLn $ "6. Consulta els k primers valors d'una propietat de les arestes"
 
   linia <- getLine
   if linia == "0" then do
@@ -72,6 +75,49 @@ bucle graf = do
 
     bucle graf
     return()
+
+  else if linia == "4" then do
+    putStrLn $ "Introdueix el nom del vertex/aresta"
+    vertex <- getLine
+
+    let temp = graf
+    totesLesPropietatsDelVertexOAresta graf vertex
+
+    putStrLn $ ""
+
+    bucle graf
+    return()
+
+  else if linia == "5" then do
+    putStrLn $ "Introdueix el nom de la propietat i els k primers"
+    propietat <- getLine
+    numero <- getLine
+
+    let k = read numero :: Int
+
+    let temp = graf
+    obtenirPropV temp k propietat
+
+    putStrLn $ ""
+
+    bucle graf
+    return()
+
+  else if linia == "6" then do
+    putStrLn $ "Introdueix el nom de la propietat i els k primers"
+    propietat <- getLine
+    numero <- getLine
+
+    let k = read numero :: Int
+
+    let temp = graf
+    obtenirPropA temp k propietat
+
+    putStrLn $ ""
+
+    bucle graf
+    return()
+
   else
     bucle graf
 
@@ -350,3 +396,44 @@ afegirLabels (Graf vertexs arestes labels props rho lambda sigma) punto label = 
   let lambda = insereix (Etiqueta punto label) temp
 
   return (Graf vertexs arestes labels props rho lambda sigma)
+
+--Consultar totes les propietats d'un graf
+totesLesPropietatsDelVertexOAresta :: Graf -> String -> IO()
+totesLesPropietatsDelVertexOAresta (Graf vertexs arestes labels props rho lambda sigma) punt = do
+  imprimirPropsPunto punt props sigma
+  return()
+
+--Obtenir les k primeres propietatas dels vertexs
+obtenirLlistaLabelValors :: [String] -> String -> Abc Etiqueta -> Abc SigmaValue -> IO [(String, String)]
+obtenirLlistaLabelValors [] _ _ _ = do return ([])
+obtenirLlistaLabelValors (actual:vertexs) propietat lambdaTree sigmaTree = do
+  case (cerca (Etiqueta actual " ") lambdaTree) of
+    Just (Etiqueta node label) -> do
+      let migLabel = label
+
+      case (cerca (SigmaValue actual propietat " ") sigmaTree) of
+        Just (SigmaValue snode spropietat svalue) -> do
+          let migValor = svalue
+
+          resta <- obtenirLlistaLabelValors vertexs propietat lambdaTree sigmaTree
+          let result = [(migLabel, migValor)] ++ resta
+          return result
+
+        Nothing -> do
+          result <- obtenirLlistaLabelValors vertexs propietat lambdaTree sigmaTree
+          return result
+
+    Nothing -> do
+      result <- obtenirLlistaLabelValors vertexs propietat lambdaTree sigmaTree
+      return result
+
+--Obtenir les k propietats de un tipus de part del node
+obtenirPropV :: Graf -> Int -> String -> IO()
+obtenirPropV (Graf vertexs arestes labels props rho lambda sigma) k propietat = do
+  llista <- obtenirLlistaLabelValors vertexs propietat lambda sigma
+  print $ take k llista
+
+obtenirPropA :: Graf -> Int -> String -> IO()
+obtenirPropA (Graf vertexs arestes labels props rho lambda sigma) k propietat = do
+  llista <- obtenirLlistaLabelValors arestes propietat lambda sigma
+  print $ take k llista
