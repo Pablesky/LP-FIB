@@ -3,4 +3,4 @@ all:
 	./propgraphs
 
 clean:
-	rm *.o *.hi
+	rm -f *.o *.hi
