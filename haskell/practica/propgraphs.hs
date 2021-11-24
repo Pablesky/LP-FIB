@@ -25,6 +25,9 @@ main = do
 
 bucle :: Graf -> IO()
 bucle graf = do
+
+  showGraph graf
+
   putStrLn $ "Escull entre les seguents opcions:"
   putStrLn $ "0. Sortir"
   putStrLn $ "1. Afegir una aresta"
@@ -33,6 +36,8 @@ bucle graf = do
   putStrLn $ "4. Consultar les propietats d'un vertex o una aresta"
   putStrLn $ "5. Consulta els k primers valors d'una propietat de les arestes"
   putStrLn $ "6. Consulta els k primers valors d'una propietat de les arestes"
+  putStrLn $ "7. Consulta que existeix un cami de v1 a v2 pssant per arestes que tenen un label determinat"
+  putStrLn $ "8. Consulta que existeix un cami de v1 a v2 pssant per k arestes"
 
   linia <- getLine
   if linia == "0" then do
@@ -46,7 +51,6 @@ bucle graf = do
 
     let temp = graf
     graf <- afegirAresta temp aresta v1 v2
-    showGraph graf
 
     bucle graf
     return()
@@ -59,7 +63,6 @@ bucle graf = do
 
     let temp = graf
     graf <- afegirPropietatVertexAresta temp vertex propietat valor
-    showGraph graf
 
     bucle graf
     return()
@@ -71,13 +74,12 @@ bucle graf = do
 
     let temp = graf
     graf <- afegirLabels temp vertex label
-    showGraph graf
 
     bucle graf
     return()
 
   else if linia == "4" then do
-    putStrLn $ "Introdueix el nom del vertex/aresta"
+    putStrLn $ "Introdueix el nom del vertex/aresta (un per linia)"
     vertex <- getLine
 
     let temp = graf
@@ -89,7 +91,7 @@ bucle graf = do
     return()
 
   else if linia == "5" then do
-    putStrLn $ "Introdueix el nom de la propietat i els k primers"
+    putStrLn $ "Introdueix el nom de la propietat i els k primers (un per linia)"
     propietat <- getLine
     numero <- getLine
 
@@ -104,7 +106,7 @@ bucle graf = do
     return()
 
   else if linia == "6" then do
-    putStrLn $ "Introdueix el nom de la propietat i els k primers"
+    putStrLn $ "Introdueix el nom de la propietat i els k primers (un per linia)"
     propietat <- getLine
     numero <- getLine
 
@@ -112,6 +114,46 @@ bucle graf = do
 
     let temp = graf
     obtenirPropA temp k propietat
+
+    putStrLn $ ""
+
+    bucle graf
+    return()
+
+  else if linia == "7" then do
+    putStrLn $ "Introdueix el nom de la etiqueta i els dos vertexs (un per linia)"
+    lab <- getLine
+    v1 <- getLine
+    v2 <- getLine
+
+    let temp = graf
+    existe <- reachable graf v1 v2 lab
+
+    if existe then do
+      putStrLn $ "Existe un camino"
+    else do
+      putStrLn $ "No existe un camino"
+
+    putStrLn $ ""
+
+    bucle graf
+    return()
+
+  else if linia == "8" then do
+    putStrLn $ "Introdueix el numero de salts i els dos vertexs (un per linia)"
+    k <- getLine
+    v1 <- getLine
+    v2 <- getLine
+
+    let numero = read k :: Int
+
+    let temp = graf
+    existe <- kHopes graf v1 v2 numero
+
+    if existe then do
+      putStrLn $ "Existe un camino"
+    else do
+      putStrLn $ "No existe un camino"
 
     putStrLn $ ""
 
@@ -138,6 +180,13 @@ cerca x (Node k fe fd)
     | x <  k        = cerca x fe
     | x >  k        = cerca x fd
     | x == k        = Just k
+
+cerca1 :: Ord a => a -> Abc a -> Bool
+cerca1 x Buit = False
+cerca1 x (Node k fe fd)
+    | x <  k        = cerca1 x fe
+    | x >  k        = cerca1 x fd
+    | x == k        = True
 
 existeix :: Aresta -> Abc Aresta -> Bool
 existeix _ Buit = False
@@ -403,7 +452,7 @@ totesLesPropietatsDelVertexOAresta (Graf vertexs arestes labels props rho lambda
   imprimirPropsPunto punt props sigma
   return()
 
---Obtenir les k primeres propietatas dels vertexs
+--Obtenir les primeres propietatas dels vertexs en forma [(Label, Valor)] de la propietat seleccionada
 obtenirLlistaLabelValors :: [String] -> String -> Abc Etiqueta -> Abc SigmaValue -> IO [(String, String)]
 obtenirLlistaLabelValors [] _ _ _ = do return ([])
 obtenirLlistaLabelValors (actual:vertexs) propietat lambdaTree sigmaTree = do
@@ -437,3 +486,107 @@ obtenirPropA :: Graf -> Int -> String -> IO()
 obtenirPropA (Graf vertexs arestes labels props rho lambda sigma) k propietat = do
   llista <- obtenirLlistaLabelValors arestes propietat lambda sigma
   print $ take k llista
+
+--Funcio reachable
+llistaVertexsConnectatsLabel :: [String] -> String -> Abc Etiqueta -> Abc Aresta -> IO [(String, String)]
+llistaVertexsConnectatsLabel [] _ _ _ = do return ([])
+llistaVertexsConnectatsLabel (aresta:arestes) label lambdaTree rhoTree = do
+  case (cerca (Etiqueta aresta " ") lambdaTree) of
+    Just (Etiqueta aresta labelAct) -> do
+      case (cerca (Aresta aresta " " " ") rhoTree) of
+        Just (Aresta a v1 v2) -> do
+
+          if label == labelAct then do
+            resultMig <- llistaVertexsConnectatsLabel arestes label lambdaTree rhoTree
+            let result = [(v1, v2)] ++ resultMig
+            return result
+          else do
+            result <- llistaVertexsConnectatsLabel arestes label lambdaTree rhoTree
+            return result
+
+        Nothing -> do
+          result <- llistaVertexsConnectatsLabel arestes label lambdaTree rhoTree
+          return result
+
+    Nothing -> do
+      result <- llistaVertexsConnectatsLabel arestes label lambdaTree rhoTree
+      return result
+
+--Funcio reachable
+llistaVertexsConnectats :: [String] -> Abc Aresta -> IO [(String, String)]
+llistaVertexsConnectats [] _  = do return ([])
+llistaVertexsConnectats (aresta:arestes) rhoTree = do
+  case (cerca (Aresta aresta " " " ") rhoTree) of
+    Just (Aresta a v1 v2) -> do
+      resultMig <- llistaVertexsConnectats arestes rhoTree
+      let result = [(v1, v2)] ++ resultMig
+      return result
+
+    Nothing -> do
+      result <- llistaVertexsConnectats arestes rhoTree
+      return result
+
+esInici :: String -> (String, String) -> Bool
+esInici inicio (v1, _) = v1 == inicio
+
+esSolucio :: String -> (String, String) -> Bool
+esSolucio final (_, v2) = v2 == final
+
+sonConsecutius :: (String, String) -> (String, String) -> Bool
+sonConsecutius (_, v2i) (v2ii, _) = v2i == v2ii
+
+dePairALlista :: [(String, String)] -> [String]
+dePairALlista [] = []
+dePairALlista ((_,v1):resta) = v1:dePairALlista resta
+
+bfs :: [(String, String)] -> [String] -> Abc String -> String -> IO Bool
+bfs _ [] _ _ = do return (False)
+bfs vertexs (primero:cua) arbre final = do
+  if primero == final then do
+    return (True)
+
+  else do
+    if (cerca1 primero arbre) then do
+      solu <- bfs vertexs cua arbre final
+      return (solu)
+
+    else do
+      let temp = arbre
+      let arbre = insereix primero temp
+
+      let adyacentes = filter (esInici primero) vertexs
+      let nuevaCola = cua ++ (dePairALlista adyacentes)
+
+      solu <- bfs vertexs nuevaCola arbre final
+      return (solu)
+
+
+reachable :: Graf -> String -> String -> String -> IO Bool
+reachable (Graf vertexs arestes labels props rho lambda sigma) vertex1 vertex2 label = do
+  llista <- llistaVertexsConnectatsLabel arestes label lambda rho
+
+  let temp = filter (esInici vertex1) llista
+  let cua = dePairALlista temp
+
+  let arbre = buit
+
+  result <- bfs llista cua arbre vertex2
+
+  print $ llista
+
+  return result
+
+kHopes :: Graf -> String -> String -> Int -> IO Bool
+kHopes (Graf vertexs arestes labels props rho lambda sigma) vertex1 vertex2 k = do
+  llista <- llistaVertexsConnectats arestes rho
+
+  let temp = filter (esInici vertex1) llista
+  let cua = dePairALlista temp
+
+  let arbre = buit
+
+  result <- bfs llista cua arbre vertex2
+
+  print $ llista
+
+  return result
