@@ -1,2 +1,0 @@
-all:
-	antlr4 -Dlanguage=Python3 -no-listener Exp

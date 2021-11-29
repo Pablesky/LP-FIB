@@ -26,8 +26,34 @@ def potencia(n1, n2):
     return n1 ** n2
 
 
+def igual(n1, n2):
+    print(type(n1))
+    print(type(n2))
+    print(n1)
+    print(n2)
+    return n1 == n2
+
+
+def menor(n1, n2):
+    return n1 < n2
+
+
+def mayor(n1, n2):
+    return n1 > n2
+
+
+def menorigual(n1, n2):
+    return n1 <= n2
+
+
+def mayorigual(n1, n2):
+    return n1 >= n2
+
+
 diccionario = {'+': suma, '-': resta,
-               '*': multiplicacion, '/': division, '^': potencia}
+               '*': multiplicacion, '/': division, '^': potencia,
+               '=': igual, '<': menor, '>': mayor,
+               '>=': menorigual, '<=': mayorigual}
 
 
 class TreeVisitor(ExprVisitor):
@@ -61,5 +87,6 @@ class TreeVisitor(ExprVisitor):
                 self.taulaSimbols[l[0].getText()] = self.visit(l[2])
 
             else:
+                #print(len(list(l[0].getChildren())))
                 return diccionario[l[1].getText()](self.visit(l[0]),
                                                    self.visit(l[2]))
