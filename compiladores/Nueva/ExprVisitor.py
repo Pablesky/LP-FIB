@@ -14,23 +14,8 @@ class ExprVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by ExprParser#value.
-    def visitValue(self, ctx:ExprParser.ValueContext):
-        return self.visitChildren(ctx)
-
-
     # Visit a parse tree produced by ExprParser#expr.
     def visitExpr(self, ctx:ExprParser.ExprContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by ExprParser#ifcondition.
-    def visitIfcondition(self, ctx:ExprParser.IfconditionContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by ExprParser#conditional.
-    def visitConditional(self, ctx:ExprParser.ConditionalContext):
         return self.visitChildren(ctx)
 
 

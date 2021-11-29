@@ -27,10 +27,6 @@ def potencia(n1, n2):
 
 
 def igual(n1, n2):
-    print(type(n1))
-    print(type(n2))
-    print(n1)
-    print(n2)
     return n1 == n2
 
 
@@ -90,3 +86,13 @@ class TreeVisitor(ExprVisitor):
                 #print(len(list(l[0].getChildren())))
                 return diccionario[l[1].getText()](self.visit(l[0]),
                                                    self.visit(l[2]))
+
+    def visitConditional(self, ctx):
+        l = list(ctx.getChildren())
+        return diccionario[l[1].getText()](self.visit(l[0]),
+                                           self.visit(l[2]))
+
+    def visitIfcondition(self, ctx):
+        l = list(ctx.getChildren())
+        if self.visit(l[1]):
+            return self.visit(l[3])
