@@ -1,0 +1,11 @@
+a:=0
+b:=1
+
+contador:=0
+while contador < 20 do
+  write a
+  temporal:=a+b
+  a:=b
+  b:=temporal
+  contador:=contador + 1
+end
