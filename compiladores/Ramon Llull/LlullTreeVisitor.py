@@ -68,6 +68,22 @@ class LlullTreeVisitor(llullVisitor):
         self.taulaSimbols = [{}]
         self.taulaFuncions = {}
 
+    def empieza(self, func):
+        ejecuto = self.taulaFuncions[func]
+        cuerpo = ejecuto[1]
+        self.visit(cuerpo)
+
+    def empieza(self, func, values):
+
+        ejecuto = self.taulaFuncions[func]
+        cuerpo = ejecuto[1]
+        asignaciones = ejecuto[0]
+
+        for i in range(0, len(asignaciones)):
+            self.taulaSimbols[-1][asignaciones[i]] = int(values[i])
+
+        self.visit(cuerpo)
+
     def visitExpr(self, ctx):
         llistaFills = list(ctx.getChildren())
         if (len(llistaFills) == 1):
@@ -180,6 +196,14 @@ class LlullTreeVisitor(llullVisitor):
         llistaFills = list(ctx.getChildren())
         if (self.visit(llistaFills[2])):
             self.visit(llistaFills[5])
+
+        else:
+            if (len(llistaFills) == 8):
+                self.visit(llistaFills[7])
+
+    def visitElseCondicion(self, ctx):
+        llistaFills = list(ctx.getChildren())
+        self.visit(llistaFills[2])
 
     def visitCondicion(self, ctx):
         llistaFills = list(ctx.getChildren())

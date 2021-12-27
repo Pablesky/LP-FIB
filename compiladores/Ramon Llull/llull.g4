@@ -4,7 +4,8 @@ root : bloc EOF;
 
 bloc : instru* ;
 
-instru : expr
+instru : ejecutarFuncion
+  |ifCondicion
   |condicion
   |assigancio
   |lectura
@@ -12,8 +13,7 @@ instru : expr
   |bucleWhile
   |bucleFor
   |asignacionFuncion
-  |ejecutarFuncion
-  |ifCondicion
+  |expr
   ;
 
 expr : '(' expr ')'
@@ -41,11 +41,13 @@ asignacionFuncion : 'void' ID '(' asigParametros ')' '{' bloc '}' ;
 
 ejecutarFuncion: ID '(' ejecParametros ')' ;
 
-asigParametros : ID (',' ID)* ;
+asigParametros : (ID (',' ID)* )? ;
 
-ejecParametros : expr (',' expr)* ;
+ejecParametros : (expr (',' expr)* )? ;
 
-ifCondicion : 'if' '(' condicion ')' '{' bloc '}' ;
+ifCondicion : 'if' '(' condicion ')' '{' bloc '}' (elseCondicion)?;
+
+elseCondicion: 'else' '{' bloc '}';
 
 ID : [a-zA-Z]+ ;
 

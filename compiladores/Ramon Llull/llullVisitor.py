@@ -89,5 +89,10 @@ class llullVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by llullParser#elseCondicion.
+    def visitElseCondicion(self, ctx:llullParser.ElseCondicionContext):
+        return self.visitChildren(ctx)
+
+
 
 del llullParser

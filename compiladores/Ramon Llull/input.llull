@@ -1,3 +1,8 @@
+void main() {
+    read(n)
+    hanoi(n, 1, 2, 3)
+}
+
 void hanoi(n, ori, dst, aux) {
     if (n > 0) {
         hanoi(n - 1, ori, aux, dst)
@@ -5,6 +10,3 @@ void hanoi(n, ori, dst, aux) {
         hanoi(n - 1, aux, dst, ori)
     }
 }
-
-read(n)
-hanoi(n, 1, 2, 3)
