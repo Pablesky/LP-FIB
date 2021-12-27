@@ -1,0 +1,13 @@
+2 + 3
+4 + 2
+2 * 3 - 5
+(2 + 2)/2
+a = 5
+b = 2
+a * b
+a ^ b + 1 * 2
+read(x)
+x + 1
+write(a, "no es igual", b)
+a = 2 + 3
+write ("2 + 3", "es igual a", a)
