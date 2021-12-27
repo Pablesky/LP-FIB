@@ -15,11 +15,11 @@ def main():
     visitor.visit(tree)
 
     if len(sys.argv) == 2:
-        visitor.empieza(sys.argv[2])
-    elif len(sys.argv) > 2:
-        visitor.empieza(sys.argv[2], sys.argv[3:])
+        visitor.empieza0("main")
+    elif len(sys.argv) == 3:
+        visitor.empieza0(sys.argv[2])
     else:
-        visitor.empieza("main")
+        visitor.empieza1(sys.argv[2], sys.argv[3:])
 
 
 if __name__ == '__main__':

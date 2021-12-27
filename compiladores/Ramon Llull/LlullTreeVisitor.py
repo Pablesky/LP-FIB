@@ -68,12 +68,12 @@ class LlullTreeVisitor(llullVisitor):
         self.taulaSimbols = [{}]
         self.taulaFuncions = {}
 
-    def empieza(self, func):
+    def empieza0(self, func):
         ejecuto = self.taulaFuncions[func]
         cuerpo = ejecuto[1]
         self.visit(cuerpo)
 
-    def empieza(self, func, values):
+    def empieza1(self, func, values):
 
         ejecuto = self.taulaFuncions[func]
         cuerpo = ejecuto[1]
