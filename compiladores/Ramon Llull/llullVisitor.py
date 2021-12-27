@@ -29,8 +29,23 @@ class llullVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by llullParser#condicion.
+    def visitCondicion(self, ctx:llullParser.CondicionContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by llullParser#lectura.
     def visitLectura(self, ctx:llullParser.LecturaContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by llullParser#bucleWhile.
+    def visitBucleWhile(self, ctx:llullParser.BucleWhileContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by llullParser#bucleFor.
+    def visitBucleFor(self, ctx:llullParser.BucleForContext):
         return self.visitChildren(ctx)
 
 
@@ -46,6 +61,31 @@ class llullVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by llullParser#blocStrings.
     def visitBlocStrings(self, ctx:llullParser.BlocStringsContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by llullParser#asignacionFuncion.
+    def visitAsignacionFuncion(self, ctx:llullParser.AsignacionFuncionContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by llullParser#ejecutarFuncion.
+    def visitEjecutarFuncion(self, ctx:llullParser.EjecutarFuncionContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by llullParser#asigParametros.
+    def visitAsigParametros(self, ctx:llullParser.AsigParametrosContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by llullParser#ejecParametros.
+    def visitEjecParametros(self, ctx:llullParser.EjecParametrosContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by llullParser#ifCondicion.
+    def visitIfCondicion(self, ctx:llullParser.IfCondicionContext):
         return self.visitChildren(ctx)
 
 
