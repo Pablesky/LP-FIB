@@ -28,6 +28,7 @@ ID=27
 STRING=28
 NUM=29
 WS=30
+COMMENT=31
 '('=1
 ')'=2
 '^'=3

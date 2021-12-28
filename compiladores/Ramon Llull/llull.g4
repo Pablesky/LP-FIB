@@ -55,4 +55,6 @@ STRING : '"' ~["]* '"' ;
 
 NUM : [0-9]+ ;
 
-WS : [ \n]+ -> skip ;
+WS : [ \n#] -> skip ;
+
+COMMENT : '#' ~[\r\n]* -> skip ;

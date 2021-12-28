@@ -1,12 +1,19 @@
 void main() {
-    read(n)
-    hanoi(n, 1, 2, 3)
+    # llegeix dos enters i  n'escriu el seu maxim comu divisor
+    write("Escriu dos nombres")
+    read(a)
+    read(b)
+    write("El seu MCD es") #hola que gay eres
+    euclides(a, b)
 }
 
-void hanoi(n, ori, dst, aux) {
-    if (n > 0) {
-        hanoi(n - 1, ori, aux, dst)
-        write(ori, "->", dst)
-        hanoi(n - 1, aux, dst, ori)
+void euclides(a, b) {
+    while (a <> b) {
+        if (a > b) {
+            a = a - b
+        } else {
+            b = b - a
+        }
     }
+    write(a)
 }
