@@ -6,6 +6,7 @@ import sys
 
 
 def main():
+    print(sys.argv)
     input_stream = FileStream(sys.argv[1])
     lexer = llullLexer(input_stream)
     token_stream = CommonTokenStream(lexer)
