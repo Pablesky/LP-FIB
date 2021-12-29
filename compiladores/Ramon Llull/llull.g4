@@ -4,7 +4,11 @@ root : bloc EOF;
 
 bloc : instru* ;
 
-instru : ejecutarFuncion
+instru : arrayCrear
+  |ejecutarFuncion
+  |arrayGet
+  |arraySet
+  |expr
   |ifCondicion
   |condicion
   |assigancio
@@ -16,7 +20,8 @@ instru : ejecutarFuncion
   |expr
   ;
 
-expr : '(' expr ')'
+expr : arrayGet
+  |'(' expr ')'
   |<assoc=right> expr '^' expr
   |expr ('*'|'/'|'%') expr
   |expr ('+'|'-') expr
@@ -48,6 +53,12 @@ ejecParametros : (expr (',' expr)* )? ;
 ifCondicion : 'if' '(' condicion ')' '{' bloc '}' (elseCondicion)?;
 
 elseCondicion: 'else' '{' bloc '}';
+
+arrayCrear : 'array' '(' ID ',' expr ')' ;
+
+arrayGet : 'get' '(' ID ',' expr ')' ;
+
+arraySet : 'set' '(' ID ',' expr ',' expr ')' ;
 
 ID : [a-zA-Z]+ ;
 

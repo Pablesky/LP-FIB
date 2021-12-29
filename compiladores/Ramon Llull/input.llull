@@ -1,19 +1,8 @@
-void main() {
-    # llegeix dos enters i  n'escriu el seu maxim comu divisor
-    write("Escriu dos nombres")
-    read(a)
-    read(b)
-    write("El seu MCD es") #hola que gay eres
-    euclides(a, b)
+void hola() {
+  write("Que bien va")
 }
 
-void euclides(a, b) {
-    while (a <> b) {
-        if (a > b) {
-            a = a - b
-        } else {
-            b = b - a
-        }
-    }
-    write(a)
+void main() {
+    # llegeix dos enters i  n'escriu el seu maxim comu divisor
+    hola()
 }

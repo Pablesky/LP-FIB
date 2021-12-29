@@ -94,5 +94,20 @@ class llullVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by llullParser#arrayCrear.
+    def visitArrayCrear(self, ctx:llullParser.ArrayCrearContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by llullParser#arrayGet.
+    def visitArrayGet(self, ctx:llullParser.ArrayGetContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by llullParser#arraySet.
+    def visitArraySet(self, ctx:llullParser.ArraySetContext):
+        return self.visitChildren(ctx)
+
+
 
 del llullParser

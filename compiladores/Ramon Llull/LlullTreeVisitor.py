@@ -15,6 +15,8 @@ def resta(n1, n2):
 
 
 def division(n1, n2):
+    if(n2 == 0):
+        raise Exception("El segon argument es un 0 i no es pot dividir per 0")
     return n1 // n2
 
 
@@ -88,7 +90,11 @@ class LlullTreeVisitor(llullVisitor):
         llistaFills = list(ctx.getChildren())
         if (len(llistaFills) == 1):
             contingut = llistaFills[0].getText()
-            if (contingut.isnumeric()):
+
+            if (contingut.startswith("get")):
+                return self.visit(llistaFills[0])
+
+            elif (contingut.isnumeric()):
                 return int(contingut)
             else:
                 return self.taulaSimbols[-1][contingut]
@@ -114,7 +120,7 @@ class LlullTreeVisitor(llullVisitor):
         llistaPerImprimir = self.visit(llistaFills[2])
         for impresion in llistaPerImprimir:
             print(impresion, end="")
-        print("\n")
+        print("\r")
 
     def visitBlocStrings(self, ctx):
         llistaFills = list(ctx.getChildren())
@@ -160,7 +166,15 @@ class LlullTreeVisitor(llullVisitor):
     def visitAsignacionFuncion(self, ctx):
         llistaFills = list(ctx.getChildren())
         nameFuncio = llistaFills[1].getText()
+
+        if nameFuncio in self.taulaFuncions:
+            raise Exception("La funcio ja ha sigut declarada")
+
         variables = self.visit(llistaFills[3])
+        setVariables = set(variables)
+        if len(variables) != len(setVariables):
+            raise Exception("Hi ha dos parametress formals amb el mateix nom")
+
         ejecucion = llistaFills[6]
         self.taulaFuncions[nameFuncio] = [variables, ejecucion]
 
@@ -176,14 +190,19 @@ class LlullTreeVisitor(llullVisitor):
 
     def visitEjecutarFuncion(self, ctx):
         llistaFills = list(ctx.getChildren())
-        contenido = self.visit(llistaFills[2])
-
         nameFuncio = llistaFills[0].getText()
+        if nameFuncio not in self.taulaFuncions:
+            raise Exception("La funcio no existeix")
+
+        contenido = self.visit(llistaFills[2])
         tuplaFuncion = self.taulaFuncions[nameFuncio]
         asigancionesFuturas = tuplaFuncion[0]
         cuerpo = tuplaFuncion[1]
 
         self.taulaSimbols.append({})
+
+        if len(asigancionesFuturas) != len(contenido):
+            raise Exception("Els parametres de la funcio no son els correctes")
 
         for i in range(0, len(asigancionesFuturas)):
             self.taulaSimbols[-1][asigancionesFuturas[i]
@@ -204,6 +223,28 @@ class LlullTreeVisitor(llullVisitor):
     def visitElseCondicion(self, ctx):
         llistaFills = list(ctx.getChildren())
         self.visit(llistaFills[2])
+
+    def visitArrayCrear(self, ctx):
+        llistaFills = list(ctx.getChildren())
+        name = llistaFills[2].getText()
+        longitud = self.visit(llistaFills[4])
+        self.taulaSimbols[-1][name] = [0] * longitud
+
+    def visitArraySet(self, ctx):
+        llistaFills = list(ctx.getChildren())
+        nom = llistaFills[2].getText()
+        indice = self.visit(llistaFills[4])
+        nuevoValor = self.visit(llistaFills[6])
+        self.taulaSimbols[-1][nom][indice] = nuevoValor
+
+    def visitArrayGet(self, ctx):
+        llistaFills = list(ctx.getChildren())
+        nom = llistaFills[2].getText()
+        indice = self.visit(llistaFills[4])
+        lista = self.taulaSimbols[-1][nom]
+        if len(lista) <= indice:
+            raise Exception("L'index de la taula esta fora del rang")
+        return self.taulaSimbols[-1][nom][indice]
 
     def visitCondicion(self, ctx):
         llistaFills = list(ctx.getChildren())
