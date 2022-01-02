@@ -1,7 +1,7 @@
 from antlr4 import *
 from llullLexer import llullLexer
 from llullParser import llullParser
-from LlullTreeVisitor import LlullTreeVisitor
+from llullTreeVisitor import llullTreeVisitor
 import sys
 
 
@@ -12,7 +12,7 @@ def main():
     token_stream = CommonTokenStream(lexer)
     parser = llullParser(token_stream)
     tree = parser.root()
-    visitor = LlullTreeVisitor()
+    visitor = llullTreeVisitor()
     visitor.visit(tree)
 
     if len(sys.argv) == 2:

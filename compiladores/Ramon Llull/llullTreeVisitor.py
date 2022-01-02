@@ -64,7 +64,7 @@ taulaComparacions = {'==': igual, '<': menor, '<>': diferente,
                      '>': mayor, '<=': menorigual, '>=': mayorigual}
 
 
-class LlullTreeVisitor(llullVisitor):
+class llullTreeVisitor(llullVisitor):
 
     def __init__(self):
         self.taulaSimbols = [{}]
@@ -104,7 +104,8 @@ class LlullTreeVisitor(llullVisitor):
                 return self.visit(llistaFills[1])
 
             else:
-                return taulaOperacions[llistaFills[1].getText()](self.visit(llistaFills[0]), self.visit(llistaFills[2]))
+                return taulaOperacions[llistaFills[1].getText()](
+                    self.visit(llistaFills[0]), self.visit(llistaFills[2]))
 
     def visitAssigancio(self, ctx):
         llistaFills = list(ctx.getChildren())
@@ -248,6 +249,5 @@ class LlullTreeVisitor(llullVisitor):
 
     def visitCondicion(self, ctx):
         llistaFills = list(ctx.getChildren())
-        return taulaComparacions[llistaFills[1].getText()](self.visit(llistaFills[0]),
-                                                           self.visit(
-                                                                   llistaFills[2]))
+        return taulaComparacions[llistaFills[1].getText()](
+            self.visit(llistaFills[0]), self.visit(llistaFills[2]))
