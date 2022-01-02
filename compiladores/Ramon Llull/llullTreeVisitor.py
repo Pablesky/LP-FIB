@@ -104,8 +104,14 @@ class llullTreeVisitor(llullVisitor):
                 return self.visit(llistaFills[1])
 
             else:
+                numero1 = self.visit(llistaFills[0])
+                numero2 = self.visit(llistaFills[2])
+
+                if not isinstance(numero1, int) or not isinstance(numero2, int):
+                    raise Exception("No es poden operar les arrays")
+
                 return taulaOperacions[llistaFills[1].getText()](
-                    self.visit(llistaFills[0]), self.visit(llistaFills[2]))
+                    numero1, numero2)
 
     def visitAssigancio(self, ctx):
         llistaFills = list(ctx.getChildren())
